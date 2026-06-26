@@ -16,7 +16,15 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.set('trust proxy', 1);
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://cash-flow-forecasting.netlify.app/'  // ← replace with your actual Netlify URL
+  ],
+  credentials: true
+}));
 
 // Limit payload size to 100kb to defend against extreme oversized data
 app.use(express.json({ limit: '100kb' }));
