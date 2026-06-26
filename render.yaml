@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: cash-flow-dashboard
+    env: node
+    buildCommand: "cd backend && npm install && cd ../frontend && npm install && npm run build"
+    startCommand: "cd backend && node server.js"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: NODE_ENV
+        value: production

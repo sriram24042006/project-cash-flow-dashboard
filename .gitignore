@@ -1,0 +1,32 @@
+# Environment files
+.env
+.env.txt
+
+# Node modules and build output
+**/node_modules
+frontend/dist
+frontend/dist-ssr
+
+# Local editor and OS files
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Database files
+backend/cash_flow.db
+
+# Ignore any local environment files in subprojects
+**/.env*
