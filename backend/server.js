@@ -72,11 +72,16 @@ app.use((err, req, res, next) => {
 });
 
 // Serve Frontend Static Files for unified deployment
+// Serve Frontend Static Files for unified deployment
 const path = require('path');
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-app.use((req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
+const fs = require('fs');
+const distPath = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.use((req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+    });
+}
 
 // Start Server
 app.listen(PORT, () => {
