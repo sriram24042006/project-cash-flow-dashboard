@@ -27,6 +27,7 @@ export const api = {
 
   // Auth Endpoints
   login: (username, password) => client.post('/auth/login', { username, password }),
+  register: (username, password) => client.post('/auth/register', { username, password }),
   verifyToken: () => client.get('/auth/verify'),
 
   // Admin Endpoints

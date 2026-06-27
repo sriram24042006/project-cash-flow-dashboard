@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink, useLocation, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, useLocation, Link, Navigate } from 'react-router-dom';
 import { LayoutDashboard, PlusCircle, BarChart2, Menu, X, Wallet, ChevronRight, CreditCard, Shield } from 'lucide-react';
 
 import ProjectCashFlowForecastingEntryForm from './components/ProjectCashFlowForecastingEntryForm';
@@ -107,10 +107,6 @@ const App = () => {
     return <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">Loading...</div>;
   }
 
-  if (!isAuthenticated) {
-    return <LoginView onLogin={handleLogin} />;
-  }
-
   return (
     <Router>
       <AlertBanner />
@@ -162,13 +158,21 @@ const App = () => {
           </div>
 
           <div className="p-4 border-t border-white/5 space-y-4 text-xs text-slate-400">
-            <div className="flex items-center justify-between px-2">
-                <span className="truncate max-w-[120px] text-white font-medium">{user?.username}</span>
-                <span className={`px-2 py-0.5 rounded text-[10px] ${user?.role === 'admin' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-500/20 text-slate-300'}`}>{user?.role}</span>
-            </div>
-            <button onClick={handleLogout} className="w-full py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-colors flex items-center justify-center">
-                Logout
-            </button>
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center justify-between px-2">
+                    <span className="truncate max-w-[120px] text-white font-medium">{user?.username}</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] ${user?.role === 'admin' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-500/20 text-slate-300'}`}>{user?.role}</span>
+                </div>
+                <button onClick={handleLogout} className="w-full py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-colors flex items-center justify-center">
+                    Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="w-full py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors flex items-center justify-center font-medium">
+                  Sign In / Sign Up
+              </Link>
+            )}
             <div className="text-center">&copy; 2026 CashFlow Inc.</div>
           </div>
         </nav>
@@ -220,6 +224,13 @@ const App = () => {
                 </div>
               ) : (
                 <div className="text-rose-400">Access Denied</div>
+              )
+            } />
+            <Route path="/login" element={
+              isAuthenticated ? <Navigate to="/" /> : (
+                <div className="animate-in fade-in duration-500">
+                  <LoginView onLogin={handleLogin} />
+                </div>
               )
             } />
           </Routes>

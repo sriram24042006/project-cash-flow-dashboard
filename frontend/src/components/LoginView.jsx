@@ -7,6 +7,7 @@ const LoginView = ({ onLogin }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isSignUp, setIsSignUp] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,7 +15,13 @@ const LoginView = ({ onLogin }) => {
         setIsLoading(true);
         
         try {
-            const response = await api.login(username, password);
+            let response;
+            if (isSignUp) {
+                response = await api.register(username, password);
+            } else {
+                response = await api.login(username, password);
+            }
+
             if (response.data.success) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -22,7 +29,7 @@ const LoginView = ({ onLogin }) => {
                 onLogin(response.data.user);
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to login');
+            setError(err.response?.data?.message || `Failed to ${isSignUp ? 'sign up' : 'login'}`);
         } finally {
             setIsLoading(false);
         }
@@ -39,8 +46,12 @@ const LoginView = ({ onLogin }) => {
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-6 backdrop-blur-xl">
                         <Wallet className="w-8 h-8 text-blue-400" />
                     </div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Welcome Back</h1>
-                    <p className="text-slate-400">Sign in to Cash Flow Forecasting</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight mb-2">
+                        {isSignUp ? 'Create an Account' : 'Welcome Back'}
+                    </h1>
+                    <p className="text-slate-400">
+                        {isSignUp ? 'Sign up to Cash Flow Forecasting' : 'Sign in to Cash Flow Forecasting'}
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -85,9 +96,19 @@ const LoginView = ({ onLogin }) => {
                         disabled={isLoading}
                         className="w-full flex items-center justify-center py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
-                        {isLoading ? 'Signing in...' : 'Sign In'}
+                        {isLoading ? (isSignUp ? 'Signing up...' : 'Signing in...') : (isSignUp ? 'Sign Up' : 'Sign In')}
                         {!isLoading && <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                     </button>
+                    
+                    <div className="text-center mt-4">
+                        <button
+                            type="button"
+                            onClick={() => setIsSignUp(!isSignUp)}
+                            className="text-slate-400 hover:text-white transition-colors text-sm"
+                        >
+                            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

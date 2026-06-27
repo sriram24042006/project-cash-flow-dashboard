@@ -45,6 +45,46 @@ exports.login = async (req, res, next) => {
     }
 };
 
+exports.register = async (req, res, next) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({ success: false, message: 'Username and password are required' });
+        }
+
+        // Check if user already exists
+        const { rows: existingUsers } = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+        if (existingUsers.length > 0) {
+            return res.status(409).json({ success: false, message: 'Username already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const role = 'user'; // default role
+
+        const { rows } = await pool.query(
+            'INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING id, username, role',
+            [username, hashedPassword, role]
+        );
+
+        const user = rows[0];
+
+        const token = jwt.sign(
+            { id: user.id, username: user.username, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        res.status(201).json({
+            success: true,
+            token,
+            user: { id: user.id, username: user.username, role: user.role }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.verifyToken = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     
